@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Todo List</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* Reset margin dan padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f0f4f8;
+        }
+
+        .dashboard {
+            width: 350px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .toggle-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .toggle-button:hover {
+            background-color: #0056b3;
+        }
+
+        .todo-container {
+            display: none; /* Ensure it starts hidden */
+            margin-top: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-section input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-section input:focus {
+            border-color: #007bff;
+        }
+
+        .input-section button {
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-section button:hover {
+            background-color: #218838;
+        }
+
+        .todo-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .todo-item {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .todo-item:hover {
+            background-color: #e2e6ea;
+        }
+
+        .todo-item span {
+            font-size: 16px;
+            color: #495057;
+            cursor: pointer;
+        }
+
+        .todo-item.completed span {
+            text-decoration: line-through;
+            color: #adb5bd;
+        }
+
+        .todo-item button {
+            background: none;
+            border: none;
+            color: #e63946;
+            cursor: pointer;
+            font-size: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .todo-item button:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <button class="toggle-button" onclick="toggleTodoList()">Show Todo List</button>
+        
+        <div class="todo-container" id="todoContainer">
+            <h1>Todo List</h1>
+            <div class="input-section">
+                <input type="text" id="todoInput" placeholder="Add a new task..." />
+                <button onclick="addTodo()">Add</button>
+            </div>
+            <ul class="todo-list" id="todoList"></ul>
+        </div>
+    </div>
+
+    <script>
+        function toggleTodoList() {
+            const todoContainer = document.getElementById('todoContainer');
+            const toggleButton = document.querySelector('.toggle-button');
+
+            if (todoContainer.style.display === 'none' || todoContainer.style.display === '') {
+                todoContainer.style.display = 'block';
+                toggleButton.textContent = 'Hide Todo List';
+            } else {
+                todoContainer.style.display = 'none';
+                toggleButton.textContent = 'Show Todo List';
+            }
+        }
+
+        function loadTodos() {
+            const todoList = document.getElementById('todoList');
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            todos.forEach(todoText => createTodoElement(todoText));
+        }
+
+        function saveTodos() {
+            const todoItems = Array.from(document.querySelectorAll('.todo-item span'));
+            const todos = todoItems.map(item => item.innerText);
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        function createTodoElement(todoText) {
+            const todoList = document.getElementById('todoList');
+
+            const todoItem = document.createElement('li');
+            todoItem.classList.add('todo-item');
+
+            const span = document.createElement('span');
+            span.innerText = todoText;
+            span.onclick = function () {
+                todoItem.classList.toggle('completed');
+            };
+
+            const deleteButton = document.createElement('button');
+            deleteButton.innerText = '✖';
+            deleteButton.onclick = function () {
+                todoList.removeChild(todoItem);
+                saveTodos();
+            };
+
+            todoItem.appendChild(span);
+            todoItem.appendChild(deleteButton);
+            todoList.appendChild(todoItem);
+        }
+
+        function addTodo() {
+            const todoInput = document.getElementById('todoInput');
+            const todoText = todoInput.value.trim();
+
+            if (todoText !== '') {
+                createTodoElement(todoText);
+                saveTodos();
+                todoInput.value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTodos();
+            // Ensure the todo-container starts hidden
+            document.getElementById('todoContainer').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
