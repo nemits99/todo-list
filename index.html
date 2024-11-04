@@ -218,6 +218,21 @@
             // Ensure the todo-container starts hidden
             document.getElementById('todoContainer').style.display = 'none';
         });
+       
+        if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+                console.log('ServiceWorker registration successful:', registration);
+            })
+            .catch(error => {
+                console.error('ServiceWorker registration failed:', error);
+            });
+    });
+}
+
+        // Your existing JavaScript functions (toggleTodoList, loadTodos, etc.)
     </script>
+   
 </body>
 </html>
